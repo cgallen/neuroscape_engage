@@ -97,6 +97,7 @@ def calc_dprime(hit_rate, fa_rate):
     
     return dprime
 
+
 def get_behav_values(df, var, trial_type):
     '''
     Calculate behavioral variables from the pandas data frame
@@ -120,7 +121,7 @@ def get_behav_values(df, var, trial_type):
     n_ant_targ = np.sum(data['Anticipatory_Target']) # N anticpatory responses to targets
     n_ant_nontarg = np.sum(data['Anticipatory_NonTarget']) # N anticpatory responses to non-targets
 
-    # calculate some variables used in multiple variables
+    # calculate rate info used in multiple variables
     omis_rate = (n_omissions) / (total_targets - n_ant_targ) * 100
     hit_rate = 1 - (omis_rate)/100
     comis_rate = (n_commissions) / (total_nontargets - n_ant_nontarg) * 100
@@ -183,6 +184,7 @@ def get_demographics(age, sex, norm_table):
         sys.exit('too many matches for ppt sex %s' %(sex))
 
     return age_norm, sex_norm[0]
+
 
 def acs_zscore(value, mean, std):
     '''Function to calculate zscore based on input mean and std
@@ -396,9 +398,8 @@ def main(argv = sys.argv):
         dp_z = acs_zscore(float(df_out['Dprime_impulsive']), float(dpnorm_all['half2_mean'].loc[dpnorm_idx]),
                           float(dpnorm_all['half2_std'].loc[dpnorm_idx]))
         # 3: rt std (total)
-        ### IS THIS RIGHT?
         var_z = acs_zscore(float(df_out['RTStdev_total']), float(varnorm_all['total_mean'].loc[varnorm_idx]),
-                             float(varnorm_all['total_std'].loc[varnorm_idx]))
+                           float(varnorm_all['total_std'].loc[varnorm_idx]))
 
         # calculate acs score
         acs = rt_z + dp_z + var_z + 1.80
