@@ -402,7 +402,7 @@ def main(argv = sys.argv):
                            float(varnorm_all['total_std'].loc[varnorm_idx]))
 
         # calculate acs score
-        acs = rt_z + dp_z + var_z + 1.80
+        acs = (rt_z*-1) + dp_z + (var_z*-1) + 1.80
 
         # add acs and demographic info to df_out
         df_out['ACS'] = acs
