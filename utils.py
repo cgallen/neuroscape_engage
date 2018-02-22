@@ -17,21 +17,25 @@ Z = norm.ppf
 #-----------------------------------------------------------------------------
 # FUNCTIONS
 #-----------------------------------------------------------------------------
-def get_sub_info(df):
+def get_sub_info(df, task):
     '''
-    Get subject and session info from 'Subject' name
+    Get subject and session info from datafile name
     '''
     # get the subject string input by experimenter
-    sub_str = df['Subject'][0]
+    if task == 'tova':
+        sub_str = df['Subject'][0]
+    elif task == 'filter':
+        sub_str = df
+    else:
+        raise NotImplementedError('%s sub naming not implemented' %task)
     
     # get sub num (integers in string)
     try:
         sub_num = map(int, re.findall(r'\d+', sub_str))
         # make sure something wonky hasn't happened and you only have one sess
         if len(sub_num) != 1:
-            sys.exit('too many matches for sub %s' %(sub_num))
-        else:
-            sub_num = sub_num[0]
+            print 'WARNING: multiple sub matches, %s' %(sub_num)
+        sub_num = sub_num[0]
             
         # get sess info
         pre_list = ['pre', 'Pre', 'PRE']

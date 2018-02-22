@@ -18,6 +18,7 @@ import numpy as np
 from scipy.stats import norm
 Z = norm.ppf
 import utils
+reload(utils)
 
 #-----------------------------------------------------------------------------
 # FUNCTIONS
@@ -150,7 +151,7 @@ def main(argv = sys.argv):
     
     # load the data into a pandas dataframe, ignoring the first 2 rows
     df = pd.read_csv(pjoin(data_dir, 'raw_data', data_fname), skiprows = 2, delimiter = '\t')
-    sub, sess = utils.get_sub_info(df)
+    sub, sess = utils.get_sub_info(df, 'tova')
     print '------------------------------------------------'
     print 'working on SUB: %s, SESS: %s' %(sub, sess)
     
