@@ -168,7 +168,7 @@ def main(argv = sys.argv):
     # get trial numbers corresponding to sustained/impulsive
     sus_trials = np.array((range(1, n_subtrials + 1))) # first half is sustained, 1-indexed
     imp_trials = np.array((range(1, n_subtrials + 1) + n_subtrials)) # second half is impulsive, 1-indexed
-    1/0
+    
     # get rows related to sustained/impulsive (pictures, responses, fixation)
     sus_rows = utils.return_indices_of_a(df.loc[:, 'Trial'], sus_trials)
     imp_rows = utils.return_indices_of_a(df.loc[:, 'Trial'], imp_trials)
@@ -185,7 +185,7 @@ def main(argv = sys.argv):
     code1_idx = df[code1_rows].index # indices of code1 rows
     code1_rtidx = [x+1 for x in code1_idx.tolist()] # RTs are in row after each picture
     code1_rts = df.loc[code1_rtidx, 'TTime']
-    # picture 2
+    # picture 2 (non-target)
     code2_rows = df.loc[:, 'Code'] == '2' # rows of code = 2
     code2_idx = df[code2_rows].index # indices of code2 rows
     code2_rtidx = [x+1 for x in code2_idx.tolist()] # RTs are in row after each picture
@@ -203,6 +203,7 @@ def main(argv = sys.argv):
     #-----
     # loop through impulsive/sustained trial types
     # this is so the start of the impulsive trials aren't influenced by end of sustained
+    # where the next row is an RT for the fixation cross between trials
     for tidx, ttype in enumerate(df['Type'].unique()):
 
         # get the inds just for this trial type
@@ -240,14 +241,22 @@ def main(argv = sys.argv):
     code1_ant = (code1_rts > 0) & (code1_rts < 1500)
     df.loc[code1_idx, 'Anticipatory_Target'] = np.array(code1_ant)
     # code 2 (targets)
-    # find where RTs for code 2 are les than 2500
+    # find where RTs for code 2 are les than 1500
     # add to row where pic was presented
     code2_ant = (code2_rts > 0) & (code2_rts < 1500)
     df.loc[code2_idx, 'Anticipatory_NonTarget'] = np.array(code2_ant)
 
     
     ### Clean up CorrectRT ###
-
+    
+    # set RTs < 150ms to nan
+    # cleans up anticipatory RTs (RTs between 0 and 1500)
+    # cleans up omission error RTs (RTs == 0)
+    # get all anticipatory responses (across all trials)
+    all_ant = df.loc[:, 'CorrectRT'] < 1500
+    # set these values to nans
+    df.loc[all_ant, 'CorrectRT'] = np.nan
+    1/0
     # outliers: if clean_outliers, remove RTs > 2SD (separately for each trial type)
     if rt_outliers == 'clean_outliers' and OUTLIER_THRESH != '2SD':
         raise NotImplementedError('%s criteria for outliers not implemented')
@@ -269,18 +278,7 @@ def main(argv = sys.argv):
             outliers = df.loc[ttype_inds, 'CorrectRT'] > out_thresh
             df.loc[ttype_inds & outliers, 'CorrectRT'] = np.nan
     1/0
-    # ***************************
-    # QUESTION: should the above be based on data with anticipatory RTs still in the data?
-    # this is how Erwin did it, but may not make sense
-    # ***************************
     
-    # anticipatory RTs: set RTs < 150ms to nan
-    # get all anticipatory responses (across all trials)
-    all_ant = df.loc[:, 'CorrectRT'] < 1500
-    # set these values to nans
-    df.loc[all_ant, 'CorrectRT'] = np.nan
-    
-   
     ### Calculate performance variables ###
     # setup csv to add behavioral variables
     df_out = pd.DataFrame({'subject': sub, 'session': sess}, index = np.arange(1))
