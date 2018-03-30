@@ -166,9 +166,9 @@ def main(argv = sys.argv):
     # Trial: this is the trial type (sustained vs impulsive)
     #-----
     # get trial numbers corresponding to sustained/impulsive
-    sus_trials = range(1, n_subtrials + 1) # first half is sustained, 1-indexed
-    imp_trials = range(1, n_subtrials + 1) + n_subtrials # second half is impulsive, 1-indexed
-    
+    sus_trials = np.array((range(1, n_subtrials + 1))) # first half is sustained, 1-indexed
+    imp_trials = np.array((range(1, n_subtrials + 1) + n_subtrials)) # second half is impulsive, 1-indexed
+    1/0
     # get rows related to sustained/impulsive (pictures, responses, fixation)
     sus_rows = utils.return_indices_of_a(df.loc[:, 'Trial'], sus_trials)
     imp_rows = utils.return_indices_of_a(df.loc[:, 'Trial'], imp_trials)
@@ -268,7 +268,7 @@ def main(argv = sys.argv):
             # set values above threshold to nan
             outliers = df.loc[ttype_inds, 'CorrectRT'] > out_thresh
             df.loc[ttype_inds & outliers, 'CorrectRT'] = np.nan
-    
+    1/0
     # ***************************
     # QUESTION: should the above be based on data with anticipatory RTs still in the data?
     # this is how Erwin did it, but may not make sense
