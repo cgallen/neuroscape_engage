@@ -148,6 +148,7 @@ def main(argv = sys.argv):
             'FAR', 'OmissionRate']) # all variables but ACS, which is calculated after these
     TRIAL_TYPES = ['total', 'sustained', 'impulsive']
     OUTLIER_THRESH = '2SD'
+    DEFAULT_N_TRIALS = 508
     
     # load the data into a pandas dataframe, ignoring the first 2 rows
     df = pd.read_csv(pjoin(data_dir, 'raw_data', data_fname), skiprows = 2, delimiter = '\t')
@@ -159,7 +160,10 @@ def main(argv = sys.argv):
     n_trials = df.loc[:, 'Trial'].max() # total number of trials
     n_subtrials = n_trials/2 # number of trials per sustained/impulsive
     n_qtrials = n_subtrials/2 # nuumber of trials per quarter
-
+    # quit if n_trials not what expected
+    if n_trials != DEFAULT_N_TRIALS:
+        sys.exit('%d trials different from %d expected' %(n_trials, DEFAULT_N_TRIALS))
+        
     
     ### Add columns to df for behavioral calculations ###
     #-----
