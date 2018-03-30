@@ -249,14 +249,13 @@ def main(argv = sys.argv):
     
     ### Clean up CorrectRT ###
     
-    # set RTs < 150ms to nan
-    # cleans up anticipatory RTs (RTs between 0 and 1500)
-    # cleans up omission error RTs (RTs == 0)
-    # get all anticipatory responses (across all trials)
+    # set RTs < 150ms to nan across all trials
+    # cleans up: anticipatory RTs (RTs between 0 and 1500)
+    # cleans up: omission error RTs (RTs == 0)
     all_ant = df.loc[:, 'CorrectRT'] < 1500
     # set these values to nans
     df.loc[all_ant, 'CorrectRT'] = np.nan
-    1/0
+    
     # outliers: if clean_outliers, remove RTs > 2SD (separately for each trial type)
     if rt_outliers == 'clean_outliers' and OUTLIER_THRESH != '2SD':
         raise NotImplementedError('%s criteria for outliers not implemented')
@@ -277,9 +276,10 @@ def main(argv = sys.argv):
             # set values above threshold to nan
             outliers = df.loc[ttype_inds, 'CorrectRT'] > out_thresh
             df.loc[ttype_inds & outliers, 'CorrectRT'] = np.nan
-    1/0
+            
     
     ### Calculate performance variables ###
+    
     # setup csv to add behavioral variables
     df_out = pd.DataFrame({'subject': sub, 'session': sess}, index = np.arange(1))
     
