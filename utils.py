@@ -56,7 +56,7 @@ def get_sub_info(df, task):
             sys.exit('too many matches for sess %s' %(sess))
         else:
             sess = sess[0]
-
+        
     except TypeError:
         # if the subject string is just an integer, make that sub_num
         try:

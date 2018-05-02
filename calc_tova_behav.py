@@ -59,10 +59,10 @@ def get_behav_values(df, var, trial_type):
     elif var == 'RTStdev':
         behav = data['CorrectRT'].std()/10
 
-    elif var = 'CommissionRate':
+    elif var == 'CommissionRate':
         behav = comis_rate
 
-    elif var = 'HitRate':
+    elif var == 'HitRate':
         behav = hit_rate
         
     elif var == 'FAR':
@@ -158,7 +158,7 @@ def main(argv = sys.argv):
     DEFAULT_N_TRIALS = 508
     
     # load the data into a pandas dataframe, ignoring the first 2 rows
-    df = pd.read_csv(pjoin(data_dir, data_fname), skiprows = 2, delimiter = '\t')
+    df = pd.read_csv(pjoin(data_dir, data_fname), skiprows = 2, delimiter = '\t', dtype={'Code': str})
     sub, sess = utils.get_sub_info(df, 'tova')
     print '------------------------------------------------'
     print 'working on SUB: %s, SESS: %s' %(sub, sess)
@@ -168,8 +168,8 @@ def main(argv = sys.argv):
     n_subtrials = n_trials/2 # number of trials per sustained/impulsive
     n_qtrials = n_subtrials/2 # nuumber of trials per quarter
     # quit if n_trials not what expected
-    if n_trials != DEFAULT_N_TRIALS:
-        sys.exit('%d trials different from %d expected' %(n_trials, DEFAULT_N_TRIALS))
+    #if n_trials != DEFAULT_N_TRIALS:
+    #    sys.exit('%d trials different from %d expected' %(n_trials, DEFAULT_N_TRIALS))
         
     
     ### Add columns to df for behavioral calculations ###
@@ -201,7 +201,7 @@ def main(argv = sys.argv):
     code2_idx = df[code2_rows].index # indices of code2 rows
     code2_rtidx = [x+1 for x in code2_idx.tolist()] # RTs are in row after each picture
     code2_rts = df.loc[code2_rtidx, 'TTime']
-    
+    1/0
     #-----
     # CorrectRT: these are response times for Pictures with Code = 1 stimulus
     # (analogous to Ttime in Erwin's calculations)
