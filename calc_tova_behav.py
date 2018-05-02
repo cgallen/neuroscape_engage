@@ -55,24 +55,15 @@ def get_behav_values(df, var, trial_type):
     # calculate behavior
     if var == 'RTMean':
         behav = data['CorrectRT'].mean()/10
-        
-    elif var == 'AccMean':
-        behav = n_corr_rt / (n_corr_rt + n_commissions - n_ant_nontarg) * 100
 
     elif var == 'RTStdev':
         behav = data['CorrectRT'].std()/10
-
-    elif var == 'PercentCorrect':
-        behav = (n_corr_rt + (total_nontargets - n_commissions)) / (n_corr_rt + n_omissions + total_nontargets - n_ant_nontarg) * 100
         
     elif var == 'FAR':
         behav = (n_commissions - n_ant_nontarg) / (total_nontargets - n_ant_nontarg)
 
     elif var == 'OmissionRate':
         behav = omis_rate
-
-    elif var == 'CorrectedHitRate':
-        behav = (n_corr_rt) / (n_corr_rt + n_omissions) * 100
 
     elif var == 'Dprime':
         behav = utils.calc_dprime(hit_rate, fa_rate)
@@ -125,8 +116,8 @@ def main(argv = sys.argv):
     #-----
     # user inputs
     #-----
-    data_dir = argv[1] # top level directory where /raw_data directory lives
-    data_fname = argv[2] # name of .log file to load (NB: this must live in {data_dir}/raw_data)
+    data_dir = argv[1] # top level directory where .log lives
+    data_fname = argv[2] # name of .log file to load (NB: this must live in {data_dir})
     rt_outliers = argv[3] # clean_outliers (remove trials > 2SD RTs) -or- keep_outliers (do nothing)
     # OPTIONAL: input age and sex for ACS calculation
     if len(argv) > 4:
@@ -144,14 +135,15 @@ def main(argv = sys.argv):
     #-----
     # GLOBAL variables
     #-----
-    VARS = sorted(['RTMean', 'AccMean', 'RTStdev', 'PercentCorrect', 'Dprime', 'CorrectedHitRate',
-            'FAR', 'OmissionRate']) # all variables but ACS, which is calculated after these
+    # all variables but ACS, which is calculated after these
+    VARS = sorted(['RTMean', 'RTStdev', 'CommissionRate', 'OmissionRate', 'HitRate', 'FAR', 'Dprime',
+                   'PostCommissionRT', 'NumAnticipatoryRT', 'MultipleResponseRate'])
     TRIAL_TYPES = ['total', 'sustained', 'impulsive']
     OUTLIER_THRESH = '2SD'
     DEFAULT_N_TRIALS = 508
     
     # load the data into a pandas dataframe, ignoring the first 2 rows
-    df = pd.read_csv(pjoin(data_dir, 'raw_data', data_fname), skiprows = 2, delimiter = '\t')
+    df = pd.read_csv(pjoin(data_dir, data_fname), skiprows = 2, delimiter = '\t')
     sub, sess = utils.get_sub_info(df, 'tova')
     print '------------------------------------------------'
     print 'working on SUB: %s, SESS: %s' %(sub, sess)
