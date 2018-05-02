@@ -155,7 +155,7 @@ def main(argv = sys.argv):
                    'PostCommissionRT', 'AnticipatoryRate', 'MultipleResponseRate'])
     TRIAL_TYPES = ['total', 'sustained', 'impulsive']
     OUTLIER_THRESH = '2SD'
-    DEFAULT_N_TRIALS = 508
+    DEFAULT_N_TRIALS = 500
     
     # load the data into a pandas dataframe, ignoring the first 2 rows
     df = pd.read_csv(pjoin(data_dir, data_fname), skiprows = 2, delimiter = '\t', dtype={'Code': str})
@@ -164,14 +164,15 @@ def main(argv = sys.argv):
     print 'working on SUB: %s, SESS: %s' %(sub, sess)
     
     # get trial number info
-    n_trials = df.loc[:, 'Trial'].max() # total number of trials
+    code1_rows = df.loc[:, 'Code'] == '1' # rows of code = 1 (target)
+    code2_rows = df.loc[:, 'Code'] == '2' # rows of code = 2 (non-target)
+    n_trials = sum(code1_rows) + sum(code2_rows) # total number of trials
     n_subtrials = n_trials/2 # number of trials per sustained/impulsive
     n_qtrials = n_subtrials/2 # nuumber of trials per quarter
     # quit if n_trials not what expected
-    #if n_trials != DEFAULT_N_TRIALS:
-    #    sys.exit('%d trials different from %d expected' %(n_trials, DEFAULT_N_TRIALS))
+    if n_trials != DEFAULT_N_TRIALS:
+        sys.exit('%d trials different from %d expected' %(n_trials, DEFAULT_N_TRIALS))
         
-    
     ### Add columns to df for behavioral calculations ###
     #-----
     # Trial: this is the trial type (sustained vs impulsive)
@@ -192,12 +193,10 @@ def main(argv = sys.argv):
     # Get rows/indices/rt info for code = 1 and code = 2 stimuli
     #-----
     # picture 1 (target)
-    code1_rows = df.loc[:, 'Code'] == '1' # rows of code = 1
     code1_idx = df[code1_rows].index # indices of code1 rows
     code1_rtidx = [x+1 for x in code1_idx.tolist()] # RTs are in row after each picture
     code1_rts = df.loc[code1_rtidx, 'TTime']
     # picture 2 (non-target)
-    code2_rows = df.loc[:, 'Code'] == '2' # rows of code = 2
     code2_idx = df[code2_rows].index # indices of code2 rows
     code2_rtidx = [x+1 for x in code2_idx.tolist()] # RTs are in row after each picture
     code2_rts = df.loc[code2_rtidx, 'TTime']
