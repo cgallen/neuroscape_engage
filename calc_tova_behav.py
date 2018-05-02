@@ -60,7 +60,7 @@ def get_behav_values(df, var, trial_type):
         behav = data['CorrectRT'].std()/10
 
     elif var = 'CommissionRate':
-        1/0
+        behav = comis_rate
 
     elif var = 'HitRate':
         1/0
