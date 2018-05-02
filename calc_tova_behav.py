@@ -220,23 +220,22 @@ def main(argv = sys.argv):
     #-----
     # Get rows/indices/rt info for code = 1 and code = 2 stimuli
     #-----
-    rt_rows = df.loc[:, 'Code'] == '100'
     # picture 1 (target)
     code1_idx = df[code1_rows].index # indices of code1 rows
     code1_rtidx = get_code_rtidx(df, code1_idx)
     code1_rts = df.loc[code1_rtidx, 'TTime']
     # picture 2 (non-target)
     code2_idx = df[code2_rows].index # indices of code2 rows
-    code1_rtidx = get_code_rtidx(df, code2_idx)
+    code2_rtidx = get_code_rtidx(df, code2_idx)
     code2_rts = df.loc[code2_rtidx, 'TTime']
-    1/0
+    
     #-----
     # CorrectRT: these are response times for Pictures with Code = 1 stimulus
     # (analogous to Ttime in Erwin's calculations)
     #-----
     # add rts to df, in row where picture was presented
     df.loc[code1_idx, 'CorrectRT'] = np.array(code1_rts)
-
+    1/0
     #-----
     # CommissionsRT: these are RTs of responses for Pictures with Code = 2 stimulus
     #-----
