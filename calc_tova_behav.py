@@ -76,7 +76,7 @@ def get_behav_values(df, var, trial_type):
         behav = utils.calc_dprime(hit_rate, fa_rate)
 
     elif var == 'PostCommissionRT':
-        1/0
+        behav = data['PostCommissionsRT'].mean()/10
         
     elif var == 'AnticipatoryRate':
         behav = (n_ant_targ + n_ant_nontarg) / (total_targets + total_nontargets) * 100
