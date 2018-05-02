@@ -320,23 +320,28 @@ def main(argv = sys.argv):
     
     # loop through comm_idx, to find next correct rt
     for cidx, comm_row in enumerate(comm_idx):
-        # index of next correct rt
+        comm_trial = df.loc[comm_row, 'Trial']
+        # index, trial of next correct rt
         next_corrt_row = corrt_idx[np.where(corrt_idx > comm_row)[0][0]]
+        next_corrt_trial = df.loc[next_corrt_row, 'Trial']
 
-        # if it's before the next commission, add it to the commission row
-        if cidx+1 < len(comm_idx):
-            if next_corrt_row < comm_idx[cidx+1]:
-                post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
-                df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
-        
-        # if it's the last comm_row, just take the next target
-        elif cidx+1 == len(comm_idx):
-            post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
-            df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
-            1/0
-            1/0
-    1/0
-    
+        # make sure the commission and next correct RT are in the same task block
+        for fidx, fix_trial in enumerate(FIXATION_TRIALS):
+            if not comm_trial < fix_trial < next_corrt_trial:
+                # if corrt is before the next commission, add it to the commission row
+                if cidx+1 < len(comm_idx):
+                    if next_corrt_row < comm_idx[cidx+1]:
+                        post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
+                        df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
+
+                # if it's the last comm_row, just take the next target
+                elif cidx+1 == len(comm_idx):
+                    post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
+                    df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
+            else:
+                1/0 #commission and next rt in separate blocks
+
+                
     ### Clean up Outliers ###
     # outliers: if clean_outliers, remove RTs > 2SD (separately for each trial type)
     if rt_outliers == 'clean_outliers' and OUTLIER_THRESH != '2SD':
