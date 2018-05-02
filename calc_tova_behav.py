@@ -78,7 +78,7 @@ def get_behav_values(df, var, trial_type):
         1/0
         
     elif var == 'NumAnticipatoryRT':
-        1/0
+        behav = n_ant_targ + n_ant_nontarg
         
     elif var == 'MultipleResponseRate':
         1/0
