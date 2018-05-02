@@ -45,13 +45,14 @@ def get_behav_values(df, var, trial_type):
     n_omissions = np.sum(data['Omissions']) # N omissions
     n_ant_targ = np.sum(data['Anticipatory_Target']) # N anticpatory responses to targets
     n_ant_nontarg = np.sum(data['Anticipatory_NonTarget']) # N anticpatory responses to non-targets
+    n_multiple_resp = np.sum(data['MultipleResponse']) # N multiple target responses (correct trials)
 
     # calculate rate info used in multiple variables
     omis_rate = (n_omissions) / (total_targets - n_ant_targ) * 100
     hit_rate = 1 - (omis_rate)/100
     comis_rate = (n_commissions) / (total_nontargets - n_ant_nontarg) * 100
     fa_rate = comis_rate/100
-    1/0
+    
     # calculate behavior
     if var == 'RTMean':
         behav = data['CorrectRT'].mean()/10
@@ -81,7 +82,7 @@ def get_behav_values(df, var, trial_type):
         behav = (n_ant_targ + n_ant_nontarg) / (total_targets + total_nontargets) * 100
         
     elif var == 'MultipleResponseRate':
-        1/0
+        behav = n_multiple_resp / total_targets * 100
 
     return behav, hdr
 
@@ -188,6 +189,7 @@ def main(argv = sys.argv):
     TRIAL_TYPES = ['total', 'sustained', 'impulsive']
     OUTLIER_THRESH = '2SD'
     DEFAULT_N_TRIALS = 500
+    FIXATION_TRIALS = [1, 500*(1./4)+2, 500*(2./4)+2, 500*(3./4)+2] # ignore these RTs
     
     # load the data into a pandas dataframe, ignoring the first 2 rows
     df = pd.read_csv(pjoin(data_dir, data_fname), skiprows = 2, delimiter = '\t', dtype={'Code': str})
@@ -282,7 +284,30 @@ def main(argv = sys.argv):
     all_ant = df.loc[:, 'CorrectRT'] < 1500
     # set these values to nans
     df.loc[all_ant, 'CorrectRT'] = np.nan
+
+    #-----
+    # 'MultipleResponse': booleans of whether an RT exists after code1_rtidx
+    # QUESTION: if removing outliers, do this after?
+    #-----
+    df.loc[:, 'MultipleResponse'] = np.nan
+    # loop through code1_rtidx
+    for rt_row in code1_rtidx:
+        # get correct RT info
+        corr_rt_row = rt_row - 1 # where the 'CorrectRT' lives
+        corr_rt = df.loc[corr_rt_row, 'CorrectRT']
+
+        # get post rt row info, if a response - add it
+        post_rt_row = rt_row + 1 # row after the RT
+        
+        # only run if this is a correct RT trial and not the end of df
+        if not np.isnan(corr_rt) and post_rt_row < df.shape[0]:
+            # if a response - add it
+            post_code = df.loc[post_rt_row, 'Code']
+            post_trial = df.loc[post_rt_row, 'Trial']
+            if post_code == '100' and post_trial not in FIXATION_TRIALS:
+                df.loc[corr_rt_row, 'MultipleResponse'] = True
     
+    ### Clean up Outliers ###
     # outliers: if clean_outliers, remove RTs > 2SD (separately for each trial type)
     if rt_outliers == 'clean_outliers' and OUTLIER_THRESH != '2SD':
         raise NotImplementedError('%s criteria for outliers not implemented')
