@@ -184,8 +184,8 @@ def main(argv = sys.argv):
     # GLOBAL variables
     #-----
     # all variables but ACS, which is calculated after these
-    VARS = sorted(['RTMean', 'RTStdev', 'CommissionRate', 'OmissionRate', 'HitRate', 'FAR', 'Dprime',
-                   'PostCommissionRT', 'AnticipatoryRate', 'MultipleResponseRate'])
+    VARS = ['RTMean', 'RTStdev', 'CommissionRate', 'OmissionRate', 'HitRate', 'FAR', 'Dprime',
+            'PostCommissionRT', 'AnticipatoryRate', 'MultipleResponseRate']
     TRIAL_TYPES = ['total', 'sustained', 'impulsive']
     OUTLIER_THRESH = '2SD'
     DEFAULT_N_TRIALS = 500
