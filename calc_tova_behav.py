@@ -186,7 +186,7 @@ def main(argv = sys.argv):
     # all variables but ACS, which is calculated after these
     VARS = ['RTMean', 'RTStdev', 'CommissionRate', 'OmissionRate', 'HitRate', 'FAR', 'Dprime',
             'PostCommissionRT', 'AnticipatoryRate', 'MultipleResponseRate']
-    TRIAL_TYPES = ['total', 'sustained', 'impulsive']
+    TRIAL_TYPES = ['sustained', 'impulsive', 'total']
     OUTLIER_THRESH = '2SD'
     DEFAULT_N_TRIALS = 500
     FIXATION_TRIALS = [1, 500*(1./4)+2, 500*(2./4)+2, 500*(3./4)+2] # ignore these RTs
@@ -381,7 +381,7 @@ def main(argv = sys.argv):
             # add to df_out
             df_out[hdr] = val
 
-    
+    1/0
     # now calculate ACS variable using the already calculated variables
     # NB: this only runs if age and sex were entered as inputs
     try:
