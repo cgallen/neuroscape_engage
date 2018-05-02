@@ -51,7 +51,7 @@ def get_behav_values(df, var, trial_type):
     hit_rate = 1 - (omis_rate)/100
     comis_rate = (n_commissions) / (total_nontargets - n_ant_nontarg) * 100
     fa_rate = comis_rate/100
-    
+    1/0
     # calculate behavior
     if var == 'RTMean':
         behav = data['CorrectRT'].mean()/10
@@ -66,7 +66,7 @@ def get_behav_values(df, var, trial_type):
         behav = hit_rate
         
     elif var == 'FAR':
-        behav = (n_commissions - n_ant_nontarg) / (total_nontargets - n_ant_nontarg)
+        behav = fa_rate
 
     elif var == 'OmissionRate':
         behav = omis_rate
@@ -259,7 +259,7 @@ def main(argv = sys.argv):
     code1_omit = code1_rts == 0
     # add this to df in row where picture was presented
     df.loc[code1_idx, 'Omissions'] = np.array(code1_omit)
-    1/0
+    
     #-----
     # Anticipatory_Target, Anticipatory_NonTarget: these are booleans of RTs < 150ms
     # NB: RTs in this file are *10ms
@@ -275,9 +275,7 @@ def main(argv = sys.argv):
     code2_ant = (code2_rts > 0) & (code2_rts < 1500)
     df.loc[code2_idx, 'Anticipatory_NonTarget'] = np.array(code2_ant)
 
-    
     ### Clean up CorrectRT ###
-    
     # set RTs < 150ms to nan across all trials
     # cleans up: anticipatory RTs (RTs between 0 and 1500)
     # cleans up: omission error RTs (RTs == 0)
