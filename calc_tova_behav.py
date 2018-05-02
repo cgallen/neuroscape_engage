@@ -253,7 +253,7 @@ def main(argv = sys.argv):
     #-----
     # add rts to df, in row where picture was presented
     df.loc[code2_idx, 'CommissionsRT'] = np.array(code2_rts)
-    
+
     #-----
     # Omissions: these are booleans of yes/no RT for Pictures with Code = 1 stimulus
     #-----
@@ -306,6 +306,36 @@ def main(argv = sys.argv):
             post_trial = df.loc[post_rt_row, 'Trial']
             if post_code == '100' and post_trial not in FIXATION_TRIALS:
                 df.loc[corr_rt_row, 'MultipleResponse'] = True
+
+    #-----
+    # PostCommissionsRT: these are correct target RTs after a commission
+    #-----
+    df.loc[:, 'PostCommissionsRT'] = np.nan
+    # get rows and indices of commission errors
+    comm_rows = df.loc[:, 'CommissionsRT'] > 0
+    comm_idx = df[comm_rows].index
+    # get rows and indices of correct RT
+    corrt_rows = df.loc[:, 'CorrectRT'] > 0
+    corrt_idx = df[corrt_rows].index
+    
+    # loop through comm_idx, to find next correct rt
+    for cidx, comm_row in enumerate(comm_idx):
+        # index of next correct rt
+        next_corrt_row = corrt_idx[np.where(corrt_idx > comm_row)[0][0]]
+
+        # if it's before the next commission, add it to the commission row
+        if cidx+1 < len(comm_idx):
+            if next_corrt_row < comm_idx[cidx+1]:
+                post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
+                df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
+        
+        # if it's the last comm_row, just take the next target
+        elif cidx+1 == len(comm_idx):
+            post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
+            df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
+            1/0
+            1/0
+    1/0
     
     ### Clean up Outliers ###
     # outliers: if clean_outliers, remove RTs > 2SD (separately for each trial type)
