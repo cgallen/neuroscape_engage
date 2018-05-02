@@ -58,6 +58,12 @@ def get_behav_values(df, var, trial_type):
 
     elif var == 'RTStdev':
         behav = data['CorrectRT'].std()/10
+
+    elif var = 'CommissionRate':
+        1/0
+
+    elif var = 'HitRate':
+        1/0
         
     elif var == 'FAR':
         behav = (n_commissions - n_ant_nontarg) / (total_nontargets - n_ant_nontarg)
@@ -67,6 +73,15 @@ def get_behav_values(df, var, trial_type):
 
     elif var == 'Dprime':
         behav = utils.calc_dprime(hit_rate, fa_rate)
+
+    elif var == 'PostCommissionRT':
+        1/0
+        
+    elif var == 'NumAnticipatoryRT':
+        1/0
+        
+    elif var == 'MultipleResponseRate':
+        1/0
 
     return behav, hdr
 
