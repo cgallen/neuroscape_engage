@@ -91,6 +91,7 @@ def get_code_rtidx(df, code_idx):
     and the Trial number matches associated RT row
     '''
     code_rtidx = []
+    omit_rtidx = []
     #loop through code_idx, see if there was a response
     for row in code_idx:
         # get trial number for picture
@@ -101,14 +102,20 @@ def get_code_rtidx(df, code_idx):
         next_trial = df.loc[next_row, 'Trial']
         next_resp = df.loc[next_row, 'Code']
         next_event = df.loc[next_row, 'Event Type']
+        
         # if there was a response, add it
-        if next_trial == trial_num and next_resp == '100':
+        if next_resp == '100':
             code_rtidx.append(next_row)
+            if next_trial != trial_num:
+                # add to omit_rtidx, this is a response for a separate trial
+                # usually the RT to start the 2nd block
+                omit_rtidx.append(next_row)
+        
         # if there was no response, add it to be counted as a miss later
         elif next_event == 'Picture':
             code_rtidx.append(next_row)
 
-    return code_rtidx
+    return code_rtidx, omit_rtidx
 
     
 def get_demographics(age, sex, norm_table):
@@ -222,23 +229,29 @@ def main(argv = sys.argv):
     #-----
     # picture 1 (target)
     code1_idx = df[code1_rows].index # indices of code1 rows
-    code1_rtidx = get_code_rtidx(df, code1_idx)
+    code1_rtidx, code1_omitidx = get_code_rtidx(df, code1_idx)
+    #get rts, apply corrections if needed
     code1_rts = df.loc[code1_rtidx, 'TTime']
+    code1_rts[code1_omitidx] = 0
     # picture 2 (non-target)
     code2_idx = df[code2_rows].index # indices of code2 rows
-    code2_rtidx = get_code_rtidx(df, code2_idx)
+    code2_rtidx, code2_omitidx = get_code_rtidx(df, code2_idx)
     code2_rts = df.loc[code2_rtidx, 'TTime']
-    
+    code2_rts[code2_omitidx] = 0
+    1/0
     #-----
     # CorrectRT: these are response times for Pictures with Code = 1 stimulus
     # (analogous to Ttime in Erwin's calculations)
     #-----
     # add rts to df, in row where picture was presented
     df.loc[code1_idx, 'CorrectRT'] = np.array(code1_rts)
-    1/0
+    
     #-----
     # CommissionsRT: these are RTs of responses for Pictures with Code = 2 stimulus
     #-----
+    # add rts to df, in row where picture was presented
+    df.loc[code2_idx, 'CommissionsRT'] = np.array(code2_rts)
+    1/0
     # loop through impulsive/sustained trial types
     # this is so the start of the impulsive trials aren't influenced by end of sustained
     # where the next row is an RT for the fixation cross between trials
