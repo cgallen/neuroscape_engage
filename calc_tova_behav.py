@@ -86,6 +86,31 @@ def get_behav_values(df, var, trial_type):
     return behav, hdr
 
 
+def get_code_rtidx(df, code_idx):
+    '''Function to get associated RT rows after a code presentation, where Code = 100
+    and the Trial number matches associated RT row
+    '''
+    code_rtidx = []
+    #loop through code_idx, see if there was a response
+    for row in code_idx:
+        # get trial number for picture
+        trial_num = df.loc[row, 'Trial']
+        # get trial num for next trial (where RTs are logged)
+        next_row = row + 1
+        # see if there was a Response in next_row, with same trial_num
+        next_trial = df.loc[next_row, 'Trial']
+        next_resp = df.loc[next_row, 'Code']
+        next_event = df.loc[next_row, 'Event Type']
+        # if there was a response, add it
+        if next_trial == trial_num and next_resp == '100':
+            code_rtidx.append(next_row)
+        # if there was no response, add it to be counted as a miss later
+        elif next_event == 'Picture':
+            code_rtidx.append(next_row)
+
+    return code_rtidx
+
+    
 def get_demographics(age, sex, norm_table):
     '''Function to get demographics within ranges of norm tables
     '''
@@ -178,8 +203,11 @@ def main(argv = sys.argv):
     # Trial: this is the trial type (sustained vs impulsive)
     #-----
     # get trial numbers corresponding to sustained/impulsive
-    sus_trials = np.array((range(1, n_subtrials + 1))) # first half is sustained, 1-indexed
-    imp_trials = np.array((range(1, n_subtrials + 1) + n_subtrials)) # second half is impulsive, 1-indexed
+    ## QUESTION: what is the best way to do this?
+    #sus_trials = np.array((range(1, n_subtrials + 1))) # first half is sustained, 1-indexed
+    #imp_trials = np.array((range(1, n_subtrials + 1) + n_subtrials)) # second half is impulsive, 1-indexed
+    sus_trials = np.array((range(1, (df['Trial'].max()/2) + 1))) # first half is sustained, 1-indexed
+    imp_trials = np.array((range(1, (df['Trial'].max()/2) + 1) + (df['Trial'].max()/2))) # second half is impulsive, 1-indexed
     
     # get rows related to sustained/impulsive (pictures, responses, fixation)
     sus_rows = utils.return_indices_of_a(df.loc[:, 'Trial'], sus_trials)
@@ -192,13 +220,14 @@ def main(argv = sys.argv):
     #-----
     # Get rows/indices/rt info for code = 1 and code = 2 stimuli
     #-----
+    rt_rows = df.loc[:, 'Code'] == '100'
     # picture 1 (target)
     code1_idx = df[code1_rows].index # indices of code1 rows
-    code1_rtidx = [x+1 for x in code1_idx.tolist()] # RTs are in row after each picture
+    code1_rtidx = get_code_rtidx(df, code1_idx)
     code1_rts = df.loc[code1_rtidx, 'TTime']
     # picture 2 (non-target)
     code2_idx = df[code2_rows].index # indices of code2 rows
-    code2_rtidx = [x+1 for x in code2_idx.tolist()] # RTs are in row after each picture
+    code1_rtidx = get_code_rtidx(df, code2_idx)
     code2_rts = df.loc[code2_rtidx, 'TTime']
     1/0
     #-----
