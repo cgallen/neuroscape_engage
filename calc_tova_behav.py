@@ -63,7 +63,7 @@ def get_behav_values(df, var, trial_type):
         behav = comis_rate
 
     elif var = 'HitRate':
-        1/0
+        behav = hit_rate
         
     elif var == 'FAR':
         behav = (n_commissions - n_ant_nontarg) / (total_nontargets - n_ant_nontarg)
@@ -77,8 +77,8 @@ def get_behav_values(df, var, trial_type):
     elif var == 'PostCommissionRT':
         1/0
         
-    elif var == 'NumAnticipatoryRT':
-        behav = n_ant_targ + n_ant_nontarg
+    elif var == 'AnticipatoryRate':
+        behav = (n_ant_targ + n_ant_nontarg) / (total_targets + total_nontargets) * 100
         
     elif var == 'MultipleResponseRate':
         1/0
@@ -152,7 +152,7 @@ def main(argv = sys.argv):
     #-----
     # all variables but ACS, which is calculated after these
     VARS = sorted(['RTMean', 'RTStdev', 'CommissionRate', 'OmissionRate', 'HitRate', 'FAR', 'Dprime',
-                   'PostCommissionRT', 'NumAnticipatoryRT', 'MultipleResponseRate'])
+                   'PostCommissionRT', 'AnticipatoryRate', 'MultipleResponseRate'])
     TRIAL_TYPES = ['total', 'sustained', 'impulsive']
     OUTLIER_THRESH = '2SD'
     DEFAULT_N_TRIALS = 508
