@@ -229,16 +229,16 @@ def main(argv = sys.argv):
     #-----
     # picture 1 (target)
     code1_idx = df[code1_rows].index # indices of code1 rows
-    code1_rtidx, code1_omitidx = get_code_rtidx(df, code1_idx)
+    code1_rtidx, code1_zeroidx = get_code_rtidx(df, code1_idx)
     #get rts, apply corrections if needed
     code1_rts = df.loc[code1_rtidx, 'TTime']
-    code1_rts[code1_omitidx] = 0
+    code1_rts[code1_zeroidx] = 0
     # picture 2 (non-target)
     code2_idx = df[code2_rows].index # indices of code2 rows
-    code2_rtidx, code2_omitidx = get_code_rtidx(df, code2_idx)
+    code2_rtidx, code2_zeroidx = get_code_rtidx(df, code2_idx)
     code2_rts = df.loc[code2_rtidx, 'TTime']
-    code2_rts[code2_omitidx] = 0
-    1/0
+    code2_rts[code2_zeroidx] = 0
+    
     #-----
     # CorrectRT: these are response times for Pictures with Code = 1 stimulus
     # (analogous to Ttime in Erwin's calculations)
@@ -251,28 +251,6 @@ def main(argv = sys.argv):
     #-----
     # add rts to df, in row where picture was presented
     df.loc[code2_idx, 'CommissionsRT'] = np.array(code2_rts)
-    1/0
-    # loop through impulsive/sustained trial types
-    # this is so the start of the impulsive trials aren't influenced by end of sustained
-    # where the next row is an RT for the fixation cross between trials
-    for tidx, ttype in enumerate(df['Type'].unique()):
-
-        # get the inds just for this trial type
-        ttype_inds = df.loc[:, 'Type'] == ttype
-        
-        # select data for this trial type and code 2
-        code2_rows_pertrial = df.loc[ttype_inds, 'Code'] == '2'
-        code2_idx_pertrial = df.loc[ttype_inds & code2_rows_pertrial].index # indices of code2 rows
-
-        # get rt data
-        code2_rtidx_pertrial = [x+1 for x in code2_idx_pertrial.tolist()] # RTs are in row after each picture
-        code2_rts_pertrial = np.array(df.loc[code2_rtidx_pertrial, 'TTime'])
-        
-        # remove rt from start of next trial type if present
-        if np.array(df[ttype_inds].index)[-1] != np.array(code2_rtidx_pertrial)[-1]:
-            code2_rts_pertrial[-1] = 0
-    
-        df.loc[ttype_inds & code2_rows_pertrial, 'CommissionsRT'] = code2_rts_pertrial
     
     #-----
     # Omissions: these are booleans of yes/no RT for Pictures with Code = 1 stimulus
@@ -281,7 +259,7 @@ def main(argv = sys.argv):
     code1_omit = code1_rts == 0
     # add this to df in row where picture was presented
     df.loc[code1_idx, 'Omissions'] = np.array(code1_omit)
-
+    1/0
     #-----
     # Anticipatory_Target, Anticipatory_NonTarget: these are booleans of RTs < 150ms
     # NB: RTs in this file are *10ms
