@@ -85,15 +85,13 @@ def get_behav_values(df, var, trial_type):
     elif var == 'multipleresponse_rate':
         behav = n_multiple_resp / total_targets * 100
 
-    elif var == 'tau':
-        1/0
+    elif var == 'exgauss':
+        # get exgauss variables on valid RT data
+        mu, sigma, tau = exg.maxLKHD(np.array(data['CorrectRT'].dropna()/10))
+        behav = [mu, sigma, tau]
+        hdr = ['mu_%s' %trial_type, 'sigma_%s' %trial_type, 'tau_%s' %trial_type]
 
-    elif var == 'mu':
-        1/0
-
-    elif var == 'sigma':
-        1/0
-
+        
     return behav, hdr
 
 
@@ -194,8 +192,9 @@ def main(argv = sys.argv):
     # GLOBAL variables
     #-----
     # all variables but ACS, which is calculated after these
+    # exgauss is a catch all for all three variables: mu, sigma, tau
     VARS = ['rt_mean', 'rt_stdev', 'commission_rate', 'omission_rate', 'hit_rate', 'far', 'dprime',
-            'postcommission_rt', 'anticipatory_rate', 'multipleresponse_rate', 'tau', 'mu', 'sigma']
+            'postcommission_rt', 'anticipatory_rate', 'multipleresponse_rate', 'exgauss']
     TRIAL_TYPES = ['sustained', 'impulsive', 'total']
     OUTLIER_THRESH = '2SD'
     DEFAULT_N_TRIALS = 500
@@ -389,8 +388,14 @@ def main(argv = sys.argv):
             # get behavioral variable and hdr
             val, hdr = get_behav_values(df, var, trial_type = ttype)
             # add to df_out
-            df_out[hdr] = val
+            if var != 'exgauss':
+                df_out[hdr] = val
+            elif var == 'exgauss':
+                # loop through hdr and add relevant val
+                for idx, exg in enumerate(hdr):
+                    df_out[exg] = val[idx]
 
+                    
     # now calculate ACS variable using the already calculated variables
     # NB: this only runs if age and sex were entered as inputs
     try:
