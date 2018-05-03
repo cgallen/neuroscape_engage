@@ -17,6 +17,7 @@ import re
 import numpy as np
 from scipy.stats import norm
 Z = norm.ppf
+import ExGUtils.pyexg as exg
 import utils
 reload(utils)
 
@@ -54,35 +55,44 @@ def get_behav_values(df, var, trial_type):
     fa_rate = comis_rate/100
     
     # calculate behavior
-    if var == 'RTMean':
+    if var == 'rt_mean':
         behav = data['CorrectRT'].mean()/10
 
-    elif var == 'RTStdev':
-        behav = data['CorrectRT'].std()/10
+    elif var == 'rt_stdev':
+        behav = data['CorrectRT'].std(ddof=0)/10
 
-    elif var == 'CommissionRate':
+    elif var == 'commission_rate':
         behav = comis_rate
 
-    elif var == 'HitRate':
+    elif var == 'hit_rate':
         behav = hit_rate
         
-    elif var == 'FAR':
+    elif var == 'far':
         behav = fa_rate
 
-    elif var == 'OmissionRate':
+    elif var == 'omission_rate':
         behav = omis_rate
 
-    elif var == 'Dprime':
+    elif var == 'dprime':
         behav = utils.calc_dprime(hit_rate, fa_rate)
 
-    elif var == 'PostCommissionRT':
+    elif var == 'postcommission_rt':
         behav = data['PostCommissionsRT'].mean()/10
         
-    elif var == 'AnticipatoryRate':
+    elif var == 'anticipatory_rate':
         behav = (n_ant_targ + n_ant_nontarg) / (total_targets + total_nontargets) * 100
         
-    elif var == 'MultipleResponseRate':
+    elif var == 'multipleresponse_rate':
         behav = n_multiple_resp / total_targets * 100
+
+    elif var == 'tau':
+        1/0
+
+    elif var == 'mu':
+        1/0
+
+    elif var == 'sigma':
+        1/0
 
     return behav, hdr
 
@@ -184,8 +194,8 @@ def main(argv = sys.argv):
     # GLOBAL variables
     #-----
     # all variables but ACS, which is calculated after these
-    VARS = ['RTMean', 'RTStdev', 'CommissionRate', 'OmissionRate', 'HitRate', 'FAR', 'Dprime',
-            'PostCommissionRT', 'AnticipatoryRate', 'MultipleResponseRate']
+    VARS = ['rt_mean', 'rt_stdev', 'commission_rate', 'omission_rate', 'hit_rate', 'far', 'dprime',
+            'postcommission_rt', 'anticipatory_rate', 'multipleresponse_rate', 'tau', 'mu', 'sigma']
     TRIAL_TYPES = ['sustained', 'impulsive', 'total']
     OUTLIER_THRESH = '2SD'
     DEFAULT_N_TRIALS = 500
@@ -381,7 +391,6 @@ def main(argv = sys.argv):
             # add to df_out
             df_out[hdr] = val
 
-    1/0
     # now calculate ACS variable using the already calculated variables
     # NB: this only runs if age and sex were entered as inputs
     try:
