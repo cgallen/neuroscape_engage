@@ -397,7 +397,6 @@ def main(argv = sys.argv):
     # now calculate ACS variable using the already calculated variables
     # NB: this only runs if age and sex were entered as inputs
     try:
-        1/0
         # load normative data
         # NB: these need to live in the same directory as this script
         rtnorm_all = pd.read_csv('rt_normative_data.csv') # mean RT
@@ -414,13 +413,13 @@ def main(argv = sys.argv):
         
         # calculate z-scores
         # 1: rt - half 1 (sustained)
-        rt_z = acs_zscore(float(df_out['RTMean_sustained']), float(rtnorm_all['half1_mean'].loc[rtnorm_idx]),
+        rt_z = acs_zscore(float(df_out['rt_mean_sustained']), float(rtnorm_all['half1_mean'].loc[rtnorm_idx]),
                           float(rtnorm_all['half1_std'].loc[rtnorm_idx]))
         # 2: dprime - half 2 (impulsive)
-        dp_z = acs_zscore(float(df_out['Dprime_impulsive']), float(dpnorm_all['half2_mean'].loc[dpnorm_idx]),
+        dp_z = acs_zscore(float(df_out['dprime_impulsive']), float(dpnorm_all['half2_mean'].loc[dpnorm_idx]),
                           float(dpnorm_all['half2_std'].loc[dpnorm_idx]))
         # 3: rt std (total)
-        var_z = acs_zscore(float(df_out['RTStdev_total']), float(varnorm_all['total_mean'].loc[varnorm_idx]),
+        var_z = acs_zscore(float(df_out['rt_stdev_total']), float(varnorm_all['total_mean'].loc[varnorm_idx]),
                            float(varnorm_all['total_std'].loc[varnorm_idx]))
 
         # calculate acs score
