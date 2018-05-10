@@ -53,7 +53,7 @@ def get_behav_values(df, var, trial_type):
     hit_rate = 1 - (omis_rate)/100
     comis_rate = (n_commissions) / (total_nontargets - n_ant_nontarg) * 100
     fa_rate = comis_rate/100
-    
+
     # calculate behavior
     if var == 'rt_mean':
         behav = data['CorrectRT'].mean()/10
@@ -84,10 +84,17 @@ def get_behav_values(df, var, trial_type):
         
     elif var == 'multipleresponse_rate':
         behav = n_multiple_resp / total_targets * 100
-
+        
     elif var == 'exgauss':
         # get exgauss variables on valid RT data
+        #try:
         mu, sigma, tau = exg.maxLKHD(np.array(data['CorrectRT'].dropna()/10))
+        exg_func = 'max_lkhd'
+        #except ZeroDivisionError:
+        #    [x, y] = exg.histogram(np.array(data['CorrectRT'].dropna()/10))
+        #    mu, sigma, tau = exg.minSQR(x,y)
+        #    exg_func = 'min_sqr'
+        #    1/0
         behav = [mu, sigma, tau]
         hdr = ['mu_%s' %trial_type, 'sigma_%s' %trial_type, 'tau_%s' %trial_type]
 
@@ -293,6 +300,9 @@ def main(argv = sys.argv):
     all_ant = df.loc[:, 'CorrectRT'] < 1500
     # set these values to nans
     df.loc[all_ant, 'CorrectRT'] = np.nan
+    ## do the same to CommissionRT ##
+    all_com_ant = df.loc[:, 'CommissionsRT'] < 1500
+    df.loc[all_com_ant, 'CommissionsRT'] = np.nan
 
     #-----
     # 'MultipleResponse': booleans of whether an RT exists after code1_rtidx
@@ -330,7 +340,7 @@ def main(argv = sys.argv):
     # loop through comm_idx, to find next correct rt
     for cidx, comm_row in enumerate(comm_idx):
         comm_trial = df.loc[comm_row, 'Trial']
-        
+        print comm_trial
         # don't run if it's the last trial 
         if comm_trial != imp_trials[-1]:
             # index, trial of next correct rt
@@ -339,19 +349,21 @@ def main(argv = sys.argv):
 
             # make sure the commission and next correct RT are in the same task block
             for fidx, fix_trial in enumerate(FIXATION_TRIALS):
-                if not comm_trial < fix_trial < next_corrt_trial:
+                #if comm_trial == 378 and fix_trial == 379:
+                #    1/0
+                if not comm_trial < next_corrt_trial < fix_trial:
                     # if corrt is before the next commission, add it to the commission row
                     if cidx+1 < len(comm_idx):
                         if next_corrt_row < comm_idx[cidx+1]:
                             post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
                             df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
-
+                            #print next_corrt_trial
                     # if it's the last item in comm_row list, just take the next target
                     elif cidx+1 == len(comm_idx):
                         post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
                         df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
-
-                
+                        #print next_corrt_trial
+    1/0      
     ### Clean up Outliers ###
     # outliers: if clean_outliers, remove RTs > 2SD (separately for each trial type)
     if rt_outliers == 'clean_outliers' and OUTLIER_THRESH != '2SD':
@@ -438,7 +450,7 @@ def main(argv = sys.argv):
         print '------------------------------------------------'
         print 'age & sex not entered, NOT calculating ACS value'
 
-
+    
     # save the file
     # set up names for output directory and csv file
     if rt_outliers == 'keep_outliers':
