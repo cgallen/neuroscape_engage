@@ -198,7 +198,7 @@ def main(argv = sys.argv):
     TRIAL_TYPES = ['sustained', 'impulsive', 'total']
     OUTLIER_THRESH = '2SD'
     DEFAULT_N_TRIALS = 500
-    FIXATION_TRIALS = [1, 500*(1./4)+2, 500*(2./4)+2, 500*(3./4)+2] # ignore these RTs
+    FIXATION_TRIALS = [1, 500*(1./4)+2, 500*(2./4)+3, 500*(3./4)+4] # ignore these RTs
     
     # load the data into a pandas dataframe, ignoring the first 2 rows
     df = pd.read_csv(pjoin(data_dir, data_fname), skiprows = 2, delimiter = '\t', dtype={'Code': str})
@@ -347,8 +347,6 @@ def main(argv = sys.argv):
                 elif cidx+1 == len(comm_idx):
                     post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
                     df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
-            else:
-                1/0 #commission and next rt in separate blocks
 
                 
     ### Clean up Outliers ###
@@ -399,7 +397,7 @@ def main(argv = sys.argv):
     # now calculate ACS variable using the already calculated variables
     # NB: this only runs if age and sex were entered as inputs
     try:
-    
+        1/0
         # load normative data
         # NB: these need to live in the same directory as this script
         rtnorm_all = pd.read_csv('rt_normative_data.csv') # mean RT
