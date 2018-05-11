@@ -363,7 +363,7 @@ def main(argv = sys.argv):
                         post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
                         df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
                         #print next_corrt_trial
-    1/0      
+         
     ### Clean up Outliers ###
     # outliers: if clean_outliers, remove RTs > 2SD (separately for each trial type)
     if rt_outliers == 'clean_outliers' and OUTLIER_THRESH != '2SD':
@@ -408,7 +408,7 @@ def main(argv = sys.argv):
                 for idx, exg in enumerate(hdr):
                     df_out[exg] = val[idx]
 
-                    
+              
     # now calculate ACS variable using the already calculated variables
     # NB: this only runs if age and sex were entered as inputs
     try:
