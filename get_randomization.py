@@ -28,8 +28,9 @@ def main(argv = sys.argv):
     # EXAMPLE 1 (add blank rows for future randomization):
     # rand_type = extend_file
     # n_engage = 4
-    # n_control = 4
-    # NB: n_engage + n_control must equal 8
+    # n_boing = 4
+    # n_lowdose = 4
+    # NB: n_engage + n_boing + n_lowdose must equal 12
     #--
     # EXAMPLE 2 (randomize ppt id to the next blank row):
     # rand_type = rand_ppt
@@ -44,7 +45,7 @@ def main(argv = sys.argv):
     #-----
     # GLOBAL variables
     #-----
-    N_TOTAL = 8
+    N_TOTAL = 12
     ID_NUMS = '600'
     OUT_DIR = pjoin('./randomization')
     FNAME = pjoin(OUT_DIR, 'engage_randomization.csv')
@@ -104,22 +105,24 @@ def main(argv = sys.argv):
     elif rand_type == 'extend_file': # add more blank rows for future randomization
         
         n_engage = int(argv[2]) # number of engage ppts needed
-        n_control = int(argv[3]) # number of control ppts needed
+        n_boing = int(argv[3]) # number of boing ppts needed
+        n_lowdose = int(argv[4]) # number of low-dose engage ppts needed
     
         # make directory if needed
         if not os.path.exists(OUT_DIR):
             os.makedirs(OUT_DIR)
 
-        # check that total number of participants equals 8
-        if n_engage + n_control != N_TOTAL:
-            sys.exit('total number of ppts input equals %d, not %d' %((n_engage+n_control), N_TOTAL))
+        # check that total number of participants equals 12
+        if n_engage + n_boing + n_lowdose != N_TOTAL:
+            sys.exit('total number of ppts input equals %d, not %d' %((n_engage+n_boing+n_lowdose), N_TOTAL))
 
         # set up lists of engage and control ppts
         list_engage = ['engage'] * n_engage
-        list_control = ['control'] * n_control
+        list_boing = ['boing'] * n_boing
+        list_lowdose = ['lowdose'] * n_lowdose
 
         # combine the two lists
-        list_comb = list_engage + list_control
+        list_comb = list_engage + list_boing + list_lowdose
         # shuffle the combined list
         shuffle(list_comb)
 
