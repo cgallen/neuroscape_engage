@@ -47,7 +47,7 @@ def get_behav_values(df, var, trial_type):
     n_ant_targ = np.sum(data['Anticipatory_Target']) # N anticpatory responses to targets
     n_ant_nontarg = np.sum(data['Anticipatory_NonTarget']) # N anticpatory responses to non-targets
     n_multiple_resp = np.sum(data['MultipleResponse']) # N multiple target responses (correct trials)
-
+    
     # calculate rate info used in multiple variables
     omis_rate = (n_omissions) / (total_targets - n_ant_targ) * 100
     hit_rate = 1 - (omis_rate)/100
@@ -110,27 +110,36 @@ def get_code_rtidx(df, code_idx):
     omit_rtidx = []
     #loop through code_idx, see if there was a response
     for row in code_idx:
-        # get trial number for picture
-        trial_num = df.loc[row, 'Trial']
-        # get trial num for next trial (where RTs are logged)
-        next_row = row + 1
-        # see if there was a Response in next_row, with same trial_num
-        next_trial = df.loc[next_row, 'Trial']
-        next_resp = df.loc[next_row, 'Code']
-        next_event = df.loc[next_row, 'Event Type']
-        
-        # if there was a response, add it
-        if next_resp == '100':
-            code_rtidx.append(next_row)
-            if next_trial != trial_num:
-                # add to omit_rtidx, this is a response for a separate trial
-                # usually the RT to start the 2nd block
-                omit_rtidx.append(next_row)
-        
-        # if there was no response, add it to be counted as a miss later
-        elif next_event == 'Picture':
-            code_rtidx.append(next_row)
+        #only run this analysis if it's not the last row in df
+        last_row = len(df) - 1
+        if row != last_row:
+            # get trial number for picture
+            trial_num = df.loc[row, 'Trial']
+            # get trial num for next trial (where RTs are logged)
+            next_row = row + 1
+            # see if there was a Response in next_row, with same trial_num
+            next_trial = df.loc[next_row, 'Trial']
+            next_resp = df.loc[next_row, 'Code']
+            next_event = df.loc[next_row, 'Event Type']
 
+            # if there was a response, add it
+            if next_resp == '100':
+                code_rtidx.append(next_row)
+                if next_trial != trial_num:
+                    # add to omit_rtidx, this is a response for a separate trial
+                    # usually the RT to start the 2nd block
+                    omit_rtidx.append(next_row)
+
+            # if there was no response, add it to be counted as a miss later
+            elif next_event == 'Picture':
+                code_rtidx.append(next_row)
+                #1/0
+
+        #if it is the last row, add this one to an omission
+        #elif row == last_row:
+        #    code
+        #    1/0
+    
     return code_rtidx, omit_rtidx
 
     
@@ -268,8 +277,16 @@ def main(argv = sys.argv):
     # CommissionsRT: these are RTs of responses for Pictures with Code = 2 stimulus
     #-----
     # add rts to df, in row where picture was presented
-    df.loc[code2_idx, 'CommissionsRT'] = np.array(code2_rts)
-
+    # first make sure not a corner case where last trial was Code = 2 and no resp
+    last_row_num = df.shape[0]-1
+    last_trial_type = df.loc[last_row_num]['Code']
+    #if trial code = 2, append a 0 onto code2_rts so the indexing is the correct shape
+    if last_trial_type == '2':
+        code2_rts_new = np.append(code2_rts, 0)
+        df.loc[code2_idx, 'CommissionsRT'] = np.array(code2_rts_new)
+    else:
+        df.loc[code2_idx, 'CommissionsRT'] = np.array(code2_rts)
+    
     #-----
     # Omissions: these are booleans of yes/no RT for Pictures with Code = 1 stimulus
     #-----
@@ -290,9 +307,15 @@ def main(argv = sys.argv):
     # code 2 (targets)
     # find where RTs for code 2 are les than 1500
     # add to row where pic was presented
-    code2_ant = (code2_rts > 0) & (code2_rts < 1500)
+    # first make sure not a corner case where last trial was Code = 2 and no resp
+    #if trial code = 2, append a 0 onto code2_rts so the indexing is the correct shape
+    if last_trial_type == '2':
+        code2_rts_new = np.append(code2_rts, 0)
+        code2_ant = (code2_rts_new > 0) & (code2_rts_new < 1500)
+    else:
+        code2_ant = (code2_rts > 0) & (code2_rts < 1500)
     df.loc[code2_idx, 'Anticipatory_NonTarget'] = np.array(code2_ant)
-
+    
     ### Clean up CorrectRT ###
     # set RTs < 150ms to nan across all trials
     # cleans up: anticipatory RTs (RTs between 0 and 1500)
@@ -303,7 +326,7 @@ def main(argv = sys.argv):
     ## do the same to CommissionRT ##
     all_com_ant = df.loc[:, 'CommissionsRT'] < 1500
     df.loc[all_com_ant, 'CommissionsRT'] = np.nan
-
+    
     #-----
     # 'MultipleResponse': booleans of whether an RT exists after code1_rtidx
     # QUESTION: if removing outliers, do this after?
@@ -340,7 +363,7 @@ def main(argv = sys.argv):
     # loop through comm_idx, to find next correct rt
     for cidx, comm_row in enumerate(comm_idx):
         comm_trial = df.loc[comm_row, 'Trial']
-        print comm_trial
+        
         # don't run if it's the last trial 
         if comm_trial != imp_trials[-1]:
             # index, trial of next correct rt
@@ -349,21 +372,19 @@ def main(argv = sys.argv):
 
             # make sure the commission and next correct RT are in the same task block
             for fidx, fix_trial in enumerate(FIXATION_TRIALS):
-                #if comm_trial == 378 and fix_trial == 379:
-                #    1/0
                 if not comm_trial < next_corrt_trial < fix_trial:
                     # if corrt is before the next commission, add it to the commission row
                     if cidx+1 < len(comm_idx):
                         if next_corrt_row < comm_idx[cidx+1]:
                             post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
                             df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
-                            #print next_corrt_trial
+                            
                     # if it's the last item in comm_row list, just take the next target
                     elif cidx+1 == len(comm_idx):
                         post_comm_rt = df.loc[next_corrt_row, 'CorrectRT']
                         df.loc[comm_row, 'PostCommissionsRT'] = post_comm_rt
-                        #print next_corrt_trial
-         
+                        
+        
     ### Clean up Outliers ###
     # outliers: if clean_outliers, remove RTs > 2SD (separately for each trial type)
     if rt_outliers == 'clean_outliers' and OUTLIER_THRESH != '2SD':
@@ -452,6 +473,7 @@ def main(argv = sys.argv):
 
     
     # save the file
+    1/0
     # set up names for output directory and csv file
     if rt_outliers == 'keep_outliers':
         out_dir_name = 'outliers-kept'
