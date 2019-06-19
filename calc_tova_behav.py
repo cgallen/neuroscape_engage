@@ -53,7 +53,8 @@ def get_behav_values(df, var, trial_type):
     hit_rate = 1 - (omis_rate)/100
     comis_rate = (n_commissions) / (total_nontargets - n_ant_nontarg) * 100
     fa_rate = comis_rate/100
-
+    if trial_type == 'total':
+        1/0
     # calculate behavior
     if var == 'rt_mean':
         behav = data['CorrectRT'].mean()/10
@@ -80,10 +81,10 @@ def get_behav_values(df, var, trial_type):
         behav = data['PostCommissionsRT'].mean()/10
         
     elif var == 'anticipatory_rate':
-        behav = (n_ant_targ + n_ant_nontarg) / (total_targets + total_nontargets) * 100
+        behav = (n_ant_targ + n_ant_nontarg) / (total_targets + total_nontargets)
         
     elif var == 'multipleresponse_rate':
-        behav = n_multiple_resp / total_targets * 100
+        behav = n_multiple_resp / total_targets
         
     elif var == 'exgauss':
         # get exgauss variables on valid RT data
@@ -473,7 +474,7 @@ def main(argv = sys.argv):
 
     
     # save the file
-    1/0
+    
     # set up names for output directory and csv file
     if rt_outliers == 'keep_outliers':
         out_dir_name = 'outliers-kept'
