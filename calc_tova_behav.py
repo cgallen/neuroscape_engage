@@ -210,7 +210,7 @@ def main(argv = sys.argv):
     # all variables but ACS, which is calculated after these
     # exgauss is a catch all for all three variables: mu, sigma, tau
     VARS = ['rt_mean', 'rt_stdev', 'commission_rate', 'omission_rate', 'hit_rate', 'far', 'dprime',
-            'postcommission_rt', 'anticipatory_rate', 'multipleresponse_rate', 'exgauss']
+            'postcommission_rt', 'anticipatory_rate', 'multipleresponse_rate']#, 'exgauss']
     TRIAL_TYPES = ['sustained', 'impulsive', 'total']
     OUTLIER_THRESH = '2SD'
     DEFAULT_N_TRIALS = 500
